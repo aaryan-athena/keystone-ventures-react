@@ -1,4 +1,4 @@
-export type Page = 'home' | 'explore' | 'portfolio' | 'settings' | 'level';
+export type Page = 'landing' | 'auth' | 'home' | 'explore' | 'portfolio' | 'settings' | 'level' | 'admin';
 
 export interface RouteState {
   page: Page;
@@ -7,7 +7,7 @@ export interface RouteState {
 
 export function parseRoute(): RouteState {
   const params = new URLSearchParams(window.location.search);
-  const page = (params.get('page') || 'home') as Page;
+  const page = (params.get('page') || 'landing') as Page;
   const levelParam = params.get('level');
   const level = levelParam ? parseInt(levelParam, 10) || undefined : undefined;
   return { page, level };

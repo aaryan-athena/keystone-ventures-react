@@ -1,49 +1,52 @@
 import { navigate } from '../utils/router';
 
-interface Props {
-  capital: number;
-  netWorth: number;
-}
+interface Props { capital: number; netWorth: number; }
 
 export default function TopBar({ capital, netWorth }: Props) {
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9000,
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '8px 28px',
-      background: 'rgba(3,4,8,0.96)',
-      borderBottom: '1px solid rgba(255,168,76,0.20)',
+      height: '52px',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0 20px',
+      background: 'var(--bg-nav)',
+      borderBottom: '1px solid var(--border-subtle)',
+      backdropFilter: 'blur(8px)',
+      fontFamily: 'var(--font-mono)',
     }}>
       <button
         onClick={() => navigate('explore')}
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          fontFamily: "'Courier New', monospace", fontSize: '13px',
-          color: '#f4dab4', textShadow: '0 0 6px #ff8c1a',
-          padding: 0,
+          fontFamily: 'var(--font-mono)', fontSize: '11px',
+          color: 'var(--text-secondary)', letterSpacing: '0.1em',
+          padding: '6px 0',
+          transition: 'color 140ms ease',
         }}
+        onMouseEnter={e => { e.currentTarget.style.color = 'var(--color-cyan)'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
       >
         ← MAP
       </button>
 
-      <div style={{ display: 'flex', gap: '28px', alignItems: 'center' }}>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: "'Courier New', monospace", fontSize: '9px', color: '#5a4a3a', letterSpacing: '0.18em', marginBottom: '2px' }}>
-            CAPITAL
+      <div style={{ display: 'flex', gap: '2px', alignItems: 'stretch' }}>
+        {[
+          { label: 'CAPITAL', value: `$${capital.toLocaleString()}`, color: 'var(--color-amber)' },
+          { label: 'NET WORTH', value: `$${netWorth.toLocaleString()}`, color: 'var(--text-primary)' },
+        ].map((item, i) => (
+          <div key={item.label} style={{
+            padding: '4px 18px',
+            borderLeft: i > 0 ? '1px solid var(--border-subtle)' : 'none',
+            textAlign: 'center',
+          }}>
+            <div style={{ fontSize: '8px', color: 'var(--text-muted)', letterSpacing: '0.18em', marginBottom: '3px' }}>
+              {item.label}
+            </div>
+            <div style={{ fontSize: '13px', color: item.color, fontWeight: 700, letterSpacing: '0.04em' }}>
+              {item.value}
+            </div>
           </div>
-          <div style={{ fontFamily: "'Courier New', monospace", fontSize: '14px', color: '#ffb35a', textShadow: '0 0 8px #ff8c1a', letterSpacing: '0.04em' }}>
-            ${capital.toLocaleString()}
-          </div>
-        </div>
-        <div style={{ width: '1px', height: '28px', background: 'rgba(255,168,76,0.15)' }} />
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: "'Courier New', monospace", fontSize: '9px', color: '#5a4a3a', letterSpacing: '0.18em', marginBottom: '2px' }}>
-            NET WORTH
-          </div>
-          <div style={{ fontFamily: "'Courier New', monospace", fontSize: '14px', color: '#f4dab4', letterSpacing: '0.04em' }}>
-            ${netWorth.toLocaleString()}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

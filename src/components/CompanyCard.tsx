@@ -28,34 +28,37 @@ export function CompanyCard({ company, focus }: FullCardProps) {
 
   return (
     <div style={{
-      background: 'rgba(4,5,9,0.92)',
-      border: '1px solid rgba(255,168,76,0.38)',
-      borderRadius: '6px',
-      padding: '16px',
-      fontFamily: "'Courier New', monospace",
-      color: '#f4dab4',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-dim)',
+      borderRadius: '12px',
+      padding: '20px',
+      fontFamily: 'var(--font-mono)',
     }}>
-      <div style={{ fontSize: '15px', fontWeight: 'bold', letterSpacing: '0.05em', marginBottom: '3px' }}>
-        {company.name}
-      </div>
-      <div style={{ fontSize: '10px', color: '#6a5a48', fontStyle: 'italic', marginBottom: '14px', lineHeight: '1.4' }}>
-        {company.tagline}
+      {/* Company header */}
+      <div style={{ marginBottom: '16px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.04em', marginBottom: '4px' }}>
+          {company.name}
+        </div>
+        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.5 }}>
+          {company.tagline}
+        </div>
       </div>
 
-      <div style={{ borderTop: '1px solid rgba(255,168,76,0.15)', paddingTop: '10px', marginBottom: '10px' }}>
+      {/* Metrics */}
+      <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', marginBottom: '14px' }}>
         {getMetrics(company).map(({ label, value }) => {
           const hl = focusSet.has(label);
           return (
             <div key={label} style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '4px 6px',
-              background: hl ? 'rgba(255,168,76,0.07)' : 'transparent',
-              borderRadius: '3px',
-              marginBottom: '1px',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '7px 8px', borderRadius: '6px', marginBottom: '2px',
+              background: hl ? 'rgba(56,189,248,0.06)' : 'transparent',
             }}>
-              <span style={{ fontSize: '11px', letterSpacing: '0.08em', color: hl ? '#ffb35a' : '#7a6a58' }}>
+              <span style={{
+                fontSize: '11px', letterSpacing: '0.1em', fontFamily: 'var(--font-display)',
+                color: hl ? 'var(--color-cyan)' : 'var(--text-secondary)',
+                fontWeight: hl ? 700 : 400,
+              }}>
                 {label}
               </span>
               <StarRating score={value} />
@@ -64,7 +67,11 @@ export function CompanyCard({ company, focus }: FullCardProps) {
         })}
       </div>
 
-      <div style={{ fontSize: '10px', color: '#5a4a38', lineHeight: '1.55', borderTop: '1px solid rgba(255,168,76,0.10)', paddingTop: '8px' }}>
+      {/* Description */}
+      <div style={{
+        fontSize: '11px', color: 'var(--text-secondary)', lineHeight: 1.7,
+        borderTop: '1px solid var(--border-subtle)', paddingTop: '12px',
+      }}>
         {company.description}
       </div>
     </div>
@@ -78,36 +85,40 @@ interface QuizCardProps {
 }
 
 export function CompanyCardQuiz({ company, visibleMetrics }: QuizCardProps) {
-  const visible = visibleMetrics.map(m => m.toUpperCase());
-  const nHidden = 6 - visible.length;
+  const visible  = visibleMetrics.map(m => m.toUpperCase());
+  const nHidden  = 6 - visible.length;
   const focusStr = visible.join(' & ');
 
   return (
     <div style={{
-      background: 'rgba(4,5,9,0.92)',
-      border: '1px solid rgba(255,168,76,0.38)',
-      borderRadius: '8px',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-dim)',
+      borderRadius: '12px',
       padding: '22px',
-      fontFamily: "'Courier New', monospace",
-      color: '#f4dab4',
+      fontFamily: 'var(--font-mono)',
     }}>
-      <div style={{ fontSize: '20px', fontWeight: 'bold', letterSpacing: '0.05em', marginBottom: '5px' }}>
-        {company.name}
-      </div>
-      <div style={{ fontSize: '11px', color: '#6a5a48', fontStyle: 'italic', marginBottom: '18px', lineHeight: '1.5' }}>
-        {company.tagline}
+      {/* Header */}
+      <div style={{ marginBottom: '18px' }}>
+        <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.04em', marginBottom: '5px' }}>
+          {company.name}
+        </div>
+        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontStyle: 'italic', lineHeight: 1.5 }}>
+          {company.tagline}
+        </div>
       </div>
 
-      <div style={{ borderTop: '1px solid rgba(255,168,76,0.15)', paddingTop: '12px', marginBottom: '12px' }}>
+      {/* Metrics */}
+      <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '12px', marginBottom: '14px' }}>
         {getMetrics(company).map(({ label, value }) => {
           if (visible.includes(label)) {
             return (
               <div key={label} style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '6px 8px', background: 'rgba(255,168,76,0.08)',
-                borderRadius: '4px', marginBottom: '3px',
+                padding: '9px 10px',
+                background: 'rgba(56,189,248,0.07)', border: '1px solid rgba(56,189,248,0.18)',
+                borderRadius: '8px', marginBottom: '4px',
               }}>
-                <span style={{ fontSize: '12px', letterSpacing: '0.09em', color: '#ffb35a', fontWeight: 'bold' }}>
+                <span style={{ fontSize: '12px', letterSpacing: '0.1em', color: 'var(--color-cyan)', fontWeight: 700, fontFamily: 'var(--font-display)' }}>
                   {label}
                 </span>
                 <StarRating score={value} size="lg" />
@@ -117,17 +128,23 @@ export function CompanyCardQuiz({ company, visibleMetrics }: QuizCardProps) {
           return (
             <div key={label} style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '6px 8px', borderRadius: '4px', marginBottom: '3px',
+              padding: '9px 10px', borderRadius: '8px', marginBottom: '4px',
+              opacity: 0.3,
             }}>
-              <span style={{ fontSize: '12px', letterSpacing: '0.09em', color: '#1e1812' }}>{label}</span>
-              <span style={{ fontSize: '16px', color: '#18160e' }}>★★★★★</span>
+              <span style={{ fontSize: '12px', letterSpacing: '0.1em', color: 'var(--text-muted)' }}>{label}</span>
+              <span style={{ fontSize: '14px', color: 'var(--text-muted)', letterSpacing: '2px' }}>★★★★★</span>
             </div>
           );
         })}
       </div>
 
-      <div style={{ fontSize: '10px', color: '#2e2418', lineHeight: '1.55', borderTop: '1px solid rgba(255,168,76,0.08)', paddingTop: '8px' }}>
-        ■ {nHidden} metrics classified. Evaluate {focusStr} only.
+      {/* Footer note */}
+      <div style={{
+        fontSize: '10px', color: 'var(--text-muted)', lineHeight: 1.6,
+        borderTop: '1px solid var(--border-subtle)', paddingTop: '10px',
+        letterSpacing: '0.05em',
+      }}>
+        {nHidden} metric{nHidden !== 1 ? 's' : ''} classified · Evaluate <span style={{ color: 'var(--color-cyan)' }}>{focusStr}</span> only.
       </div>
     </div>
   );

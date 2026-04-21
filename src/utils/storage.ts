@@ -1,3 +1,6 @@
+import { auth } from '../firebase';
+import { saveUserProgress } from '../services/userProgressService';
+
 // LocalStorage keys
 export const KEYS = {
   capital: 'kv_capital',
@@ -26,6 +29,13 @@ export interface PortfolioEntry {
 
 export type Portfolio = Record<string, PortfolioEntry>;
 
+// ── Sync helpers ──────────────────────────────────────────────────────────────
+function syncToFirestore(partial: Parameters<typeof saveUserProgress>[1]) {
+  const uid = auth.currentUser?.uid;
+  if (uid) saveUserProgress(uid, partial);
+}
+
+// ── Reads ──────────────────────────────────────────────────────────────────────
 export function getCapital(): number {
   try {
     const v = localStorage.getItem(KEYS.capital);
@@ -33,23 +43,11 @@ export function getCapital(): number {
   } catch { return 1_000_000; }
 }
 
-export function setCapital(val: number): void {
-  try { localStorage.setItem(KEYS.capital, String(val)); } catch { /* noop */ }
-}
-
 export function getPortfolio(): Portfolio {
   try {
     const raw = localStorage.getItem(KEYS.portfolio) || '{}';
     return JSON.parse(raw) as Portfolio;
   } catch { return {}; }
-}
-
-export function setPortfolio(p: Portfolio): void {
-  try {
-    localStorage.setItem(KEYS.portfolio, JSON.stringify(p));
-    const total = Object.values(p).reduce((acc, e) => acc + (e.current_value ?? e.amount ?? 0), 0);
-    localStorage.setItem(KEYS.portfolioTotal, String(total));
-  } catch { /* noop */ }
 }
 
 export function getPortfolioTotal(): number {
@@ -62,23 +60,54 @@ export function getCompleted(): number[] {
   } catch { return []; }
 }
 
+// ── Writes ─────────────────────────────────────────────────────────────────────
+export function setCapital(val: number): void {
+  try { localStorage.setItem(KEYS.capital, String(val)); } catch { /* noop */ }
+  syncToFirestore({ capital: val });
+}
+
+export function setPortfolio(p: Portfolio): void {
+  try {
+    localStorage.setItem(KEYS.portfolio, JSON.stringify(p));
+    const total = Object.values(p).reduce((acc, e) => acc + (e.current_value ?? e.amount ?? 0), 0);
+    localStorage.setItem(KEYS.portfolioTotal, String(total));
+    syncToFirestore({ portfolio: p, portfolioTotal: total });
+  } catch { /* noop */ }
+}
+
 export function markCompleted(levelId: number): void {
   try {
     const c = getCompleted();
-    if (!c.includes(levelId)) c.push(levelId);
-    localStorage.setItem(KEYS.completed, JSON.stringify(c));
+    if (!c.includes(levelId)) {
+      c.push(levelId);
+      localStorage.setItem(KEYS.completed, JSON.stringify(c));
+      syncToFirestore({ completed: c });
+    }
   } catch { /* noop */ }
 }
 
 export function resetGame(): void {
   try {
-    localStorage.removeItem(KEYS.capital);
+    localStorage.setItem(KEYS.capital, String(1_000_000));
     localStorage.removeItem(KEYS.portfolio);
     localStorage.removeItem(KEYS.portfolioTotal);
+    syncToFirestore({ capital: 1_000_000, portfolio: {}, portfolioTotal: 0 });
   } catch { /* noop */ }
 }
 
-// Re-value all portfolio entries using current completion count
+// ── Load from Firestore into localStorage (called on login) ───────────────────
+export function hydrateFromFirestore(progress: {
+  capital: number; completed: number[]; portfolio: Portfolio; portfolioTotal: number;
+}): void {
+  try {
+    localStorage.setItem(KEYS.capital, String(progress.capital));
+    localStorage.setItem(KEYS.completed, JSON.stringify(progress.completed));
+    localStorage.setItem(KEYS.portfolio, JSON.stringify(progress.portfolio));
+    localStorage.setItem(KEYS.portfolioTotal, String(progress.portfolioTotal));
+  } catch { /* noop */ }
+}
+
+// ── Re-value portfolio ─────────────────────────────────────────────────────────
 export function revaluePortfolio(completedCount: number): void {
   try {
     const p = getPortfolio();
@@ -100,6 +129,6 @@ export function revaluePortfolio(completedCount: number): void {
       e.return_pct = Math.round((mult - 1.0) * 100 * 10) / 10;
       e.status = 'valued';
     }
-    setPortfolio(p);
+    setPortfolio(p); // also syncs to Firestore
   } catch { /* noop */ }
 }
